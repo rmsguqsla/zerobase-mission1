@@ -1,3 +1,4 @@
+<%@page import="db.HistoryService"%>
 <%@page import="db.Wifi"%>
 <%@page import="java.util.List"%>
 <%@page import="db.WifiService"%>
@@ -7,6 +8,19 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<title>와이파이 정보 구하기</title>
+<script type="text/javascript">
+	function getUserLocation() {
+	    if(navigator.geolocation) {
+	    	navigator.geolocation.getCurrentPosition (function(pos) {
+	    		document.getElementById('latitude').value = pos.coords.latitude;
+	    		document.getElementById('longitude').value = pos.coords.longitude;
+	    	});
+	    } else {
+	    	alert("이 브라우저에서는 Geolocation이 지원되지 않습니다.");
+	    }
+	}
+</script>
 <style>
 	#wifi {
 	  font-family: Arial, Helvetica, sans-serif;
@@ -33,13 +47,29 @@
 </style>
 </head>
 <body>
-	<jsp:include page="header.jsp"></jsp:include>
-	<br><br>
 	<%
+		WifiService wifiService = new WifiService();
 		String latitude = request.getParameter("latitude");
 		String longitude = request.getParameter("longitude");
-		WifiService wifiService = new WifiService();
+		double lat = 0;
+		double lnt = 0;
 	%>
+	<h1>와이파이 정보 구하기</h1>
+	<a href="index.jsp">홈</a> | <a href="history.jsp">위치 히스토리 목록</a> | <a href="load-wifi.jsp">Open API 와이파이 정보 가져오기</a>
+	<br>
+	<form action="index.jsp" method="get">
+		<%
+			if(latitude != null && longitude != null) {
+				lat = Double.parseDouble(latitude);
+				lnt = Double.parseDouble(longitude);
+			}
+		%>
+		LAT: <input type="text" id="latitude" name="latitude" value=<%=lat%>>,
+		LNT: <input type="text" id="longitude" name="longitude" value=<%=lnt%>>
+		<input type="button" onclick="getUserLocation();" value="내 위치 가져오기">
+		<input type="submit" value="근처 WIFI 정보 보기">
+	</form>
+	<br><br>
 	<table id="wifi">
 		<thead>
 			<tr>
@@ -64,13 +94,15 @@
 		</thead>
 		<tbody>
 			<%
-				if(latitude == null || longitude == null) {
+				if(lat == 0 || lnt == 0) {
 			%>
 					<tr>
 						<td colspan=17 style="text-align:center">위치 정보를 입력한 후에 조회해 주세요.</td>
 					</tr>
 			<%
 				} else {
+					HistoryService historyService = new HistoryService();
+					historyService.insertHistory(latitude, longitude);
 					List<Wifi> list = wifiService.selectWifi(latitude, longitude);
 					for(Wifi wifi : list) {
 			%>

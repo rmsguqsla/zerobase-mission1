@@ -1,3 +1,6 @@
+<%@page import="db.History"%>
+<%@page import="java.util.List"%>
+<%@page import="db.HistoryService"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -45,13 +48,34 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-			</tr>
+			<%
+				HistoryService historyService = new HistoryService();
+			
+				String historyId = request.getParameter("historyId");
+			
+				if (historyId != null) {
+					historyService.historyDelete(historyId);
+				}
+
+				List<History> list = historyService.historyList();
+				
+				for (History history : list) {
+			%>
+					<tr>
+						<td><%=history.getId() %></td>
+						<td><%=history.getLat() %></td>
+						<td><%=history.getLnt() %></td>
+						<td><%=history.getInquiryDate() %></td>
+						<td style="display: block;">
+							<form action = "history.jsp" method = "post">
+								<input type="hidden" id="historyId" name="historyId" value=<%=history.getId() %>>
+								<input type="submit" value="삭제" style="margin:0 auto; display: block;">
+							</form>
+						</td>
+					</tr>
+			<%
+				}
+			%>
 		</tbody>
 	</table>
 </body>

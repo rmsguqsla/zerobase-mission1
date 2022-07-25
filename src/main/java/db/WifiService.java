@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sqlite.SQLiteException;
+
 import api.OpenApi;
 
 public class WifiService {
@@ -51,10 +53,7 @@ public class WifiService {
 					pst.setString(14, wifi.getLNT());
 					pst.setString(15, wifi.getLAT());
 					pst.setString(16, wifi.getWORK_DTTM());
-					int affected = pst.executeUpdate();
-					if (affected > 0) {
-		                System.out.println("저장 성공");
-		            }
+					pst.executeUpdate();
 				}
 				curCount += 1000;
 				start += 1000;
@@ -69,15 +68,100 @@ public class WifiService {
 			return false;
 		} finally {
 			try {
+                if (pst != null && !pst.isClosed()) {
+                    pst.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+			
+			try {
 				if (con != null && !con.isClosed()) {
 					con.close();
 				}
 			} catch(Exception e) {
 				e.printStackTrace();
-				return false;
 			}
 		}
 		return true;
+	}
+	
+	public void deleteApi() {
+		Connection con = null;
+		PreparedStatement pst = null;
+		try {
+			Class.forName("org.sqlite.JDBC");
+			String dbFile = "/Users/ogeunhyeob/Desktop/wifi.db";
+			con = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
+			
+			String sql = "delete from wifi;";
+			pst = con.prepareStatement(sql);
+			
+			int affected = pst.executeUpdate();
+			if (affected > 0) {
+				System.out.println("삭제 성공");
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+                if (pst != null && !pst.isClosed()) {
+                    pst.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+			
+			try {
+				if (con != null && !con.isClosed()) {
+					con.close();
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public int selectCount() {
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		int count = 0;
+		try {
+			Class.forName("org.sqlite.JDBC");
+			String dbFile = "/Users/ogeunhyeob/Desktop/wifi.db";
+			con = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
+			
+			String sql = "select count(*) from wifi;";
+			pst = con.prepareStatement(sql);
+			
+			rs = pst.executeQuery();
+			
+			if (rs.next()) {
+				count = rs.getInt(1);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			return -1;
+		} finally {
+			try {
+                if (pst != null && !pst.isClosed()) {
+                    pst.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+			
+			try {
+				if (con != null && !con.isClosed()) {
+					con.close();
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println(count);
+		return count;
 	}
 	
 	public List<Wifi> selectWifi(String latitude, String longitude) {

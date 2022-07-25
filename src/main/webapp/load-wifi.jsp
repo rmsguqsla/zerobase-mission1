@@ -15,13 +15,17 @@
 		OpenApi openApi = new OpenApi();
 		int listTotalCount = openApi.getListTotalCount();
 		
+		if (wifiService.selectCount() > 0) {
+			wifiService.deleteApi();
+		}
+		
 		if (wifiService.insertApi()) {
 	%>
 			<h1><%=listTotalCount %>개의 WIFI 정보를 정상적으로 저장하였습니다.</h1>
 	<%
 		} else {
 	%>
-			<h1>WIFI 정보가 이미 저장되있거나 저장하는데 실패하였습니다.</h1>
+			<h1>정보를 불러오는데 실패했습니다.</h1>
 	<%
 		}
 	%>
