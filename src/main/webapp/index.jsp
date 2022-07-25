@@ -1,3 +1,6 @@
+<%@page import="db.Wifi"%>
+<%@page import="java.util.List"%>
+<%@page import="db.WifiService"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -23,7 +26,7 @@
 	#wifi th {
 	  padding-top: 12px;
 	  padding-bottom: 12px;
-	  text-align: left;
+	  text-align: center;
 	  background-color: #04AA6D;
 	  color: white;
 	}
@@ -32,6 +35,11 @@
 <body>
 	<jsp:include page="header.jsp"></jsp:include>
 	<br><br>
+	<%
+		String latitude = request.getParameter("latitude");
+		String longitude = request.getParameter("longitude");
+		WifiService wifiService = new WifiService();
+	%>
 	<table id="wifi">
 		<thead>
 			<tr>
@@ -55,9 +63,40 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<td colspan=17 style="text-align:center">위치 정보를 입력한 후에 조회해 주세요.</td>
-			</tr>
+			<%
+				if(latitude == null || longitude == null) {
+			%>
+					<tr>
+						<td colspan=17 style="text-align:center">위치 정보를 입력한 후에 조회해 주세요.</td>
+					</tr>
+			<%
+				} else {
+					List<Wifi> list = wifiService.selectWifi(latitude, longitude);
+					for(Wifi wifi : list) {
+			%>
+						<tr>
+							<td><%=wifi.getKM() %></td>
+							<td><%=wifi.getX_SWIFI_MGR_NO() %></td>
+							<td><%=wifi.getX_SWIFI_WRDOFC() %></td>
+							<td><%=wifi.getX_SWIFI_MAIN_NM() %></td>
+							<td><%=wifi.getX_SWIFI_ADRES1() %></td>
+							<td><%=wifi.getX_SWIFI_ADRES2() %></td>
+							<td><%=wifi.getX_SWIFI_INSTL_FLOOR() %></td>
+							<td><%=wifi.getX_SWIFI_INSTL_TY() %></td>
+							<td><%=wifi.getX_SWIFI_INSTL_MBY() %></td>
+							<td><%=wifi.getX_SWIFI_SVC_SE() %></td>
+							<td><%=wifi.getX_SWIFI_CMCWR() %></td>
+							<td><%=wifi.getX_SWIFI_CNSTC_YEAR() %></td>
+							<td><%=wifi.getX_SWIFI_INOUT_DOOR() %></td>
+							<td><%=wifi.getX_SWIFI_REMARS3() %></td>
+							<td><%=wifi.getLAT() %></td>
+							<td><%=wifi.getLNT() %></td>
+							<td><%=wifi.getWORK_DTTM() %></td>
+						</tr>
+			<%
+					}
+				}
+			%>
 		</tbody>
 	</table>
 </body>

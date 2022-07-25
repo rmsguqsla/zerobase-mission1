@@ -19,12 +19,29 @@
 </script>
 </head>
 <body>
+	<%
+		String latitude = request.getParameter("latitude");
+		String longitude = request.getParameter("longitude");
+	%>
 	<h1>와이파이 정보 구하기</h1>
-	<a href="index.jsp">홈</a> | <a>위치 히스토리 목록</a> | <a href="load-wifi.jsp">Open API 와이파이 정보 가져오기</a>
+	<a href="index.jsp">홈</a> | <a href="history.jsp">위치 히스토리 목록</a> | <a href="load-wifi.jsp">Open API 와이파이 정보 가져오기</a>
 	<br>
-	LAT: <input type="text" id="latitude">,
-	LNT: <input type="text" id="longitude">
-	<button onclick="getUserLocation();">내 위치 가져오기</button>
-	<button>근처 WIFI 정보 보기</button>
+	<form action="index.jsp" method="get">
+		<%
+			if(latitude == null) {
+		%>
+				LAT: <input type="text" id="latitude" name="latitude" value=0.0>,
+				LNT: <input type="text" id="longitude" name="longitude" value=0.0>
+		<%
+			} else {
+		%>
+				LAT: <input type="text" id="latitude" name="latitude" value="<%=latitude%>">,
+				LNT: <input type="text" id="longitude" name="longitude" value="<%=longitude%>">
+		<%
+			}
+		%>
+		<input type="button" onclick="getUserLocation();" value="내 위치 가져오기">
+		<input type="submit" value="근처 WIFI 정보 보기">
+	</form>
 </body>
 </html>
